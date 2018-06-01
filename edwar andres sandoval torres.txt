@@ -1,0 +1,80 @@
+#plsql.execute <<-SQL
+
+Create table amortizacion(
+numero_cuota integer,
+cuota_mensual decimal(15,2),
+abono_capital decimal (15,2),
+abono_interes decimal(15,2),
+saldo decimal(15,2))
+
+GO
+Create PROCEDURE CALCULAR_SIMULACION
+    @tasa decimal(4,2),   
+    @Total_cuotas integer,
+@Valor_Prestamo decimal
+AS   
+ 
+delete from amortizacion
+declare @id integer
+SET @id=1
+while @id<=@Total_cuotas
+begin 
+declare @n decimal(15,2) 
+declare @d decimal(15,2) 
+declare @cuota_mensual decimal(16,2)
+declare @abono_interes decimal(16,2)
+declare @abono_capital decimal(16,2)
+ 
+SET  @n= @tasa*@Valor_Prestamo      ----Cuota mensual
+SET  @d= power(1-(1+@tasa),(-@Total_cuotas))----Cuota mensual
+
+SET @cuota_mensual=@n/@d
+SET @abono_interes=@tasa*@Valor_Prestamo
+SET @abono_capital=@cuota_mensual-@abono_interes
+
+insert into amortizacion
+SELECT @id,@cuota_mensual,@abono_capital,@abono_interes,@Valor_Prestamo-@abono_capital
+
+select @id=@id+1
+end
+SELECT * from  amortizacion
+
+GO
+
+
+
+
+-------------------------------------------------------------------------------------
+
+#SQL
+
+DECLARE
+
+type array_t is varray(50) of NUMBER;
+array array_t := array_t(1, 2, 3);
+INICIAR_SERIE NUMBER:= 100;
+temp number := 100;
+temp2 number := 100;
+
+BEGIN   
+    --almacenar INICIAR_SERIE en el array
+    temp := INICIAR_SERIE;
+       
+   for i in 2..array.count loop 
+        temp := array.last;
+       IF LENGTH(temp) < 2 THEN    
+       temp := temp + temp;
+        array(i) := temp;
+           
+        ELSIF LENGTH(temp) >= 2 THEN 
+            temp2:= SUBSTR(DATO,LENGTH(DATO),1);
+             temp:=temp+temp2; 
+            array(i) := temp;
+       END IF;
+   end loop;
+END
+
+
+
+#SQL
+
